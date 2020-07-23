@@ -1,40 +1,40 @@
 
 let mouse = {
-  x: 0,
-  y: 0
+	x: 0,
+	y: 0
 };
 // Follows the mouse event
 function onMouseMove(event) {
-  document.addEventListener('keyup', () => {
-    if (event.shiftKey) {
-      shiftPress = false;
-    }
-  })
-  if (!shiftPress) {
-    return
-  }
-  // Update the mouse letiable
-  event.preventDefault();
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+	document.addEventListener('keyup', () => {
+		if (event.shiftKey) {
+			shiftPress = false;
+		}
+	})
+	if (!shiftPress) {
+		return
+	}
+	// Update the mouse letiable
+	event.preventDefault();
+	mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+	mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-  // Make the sphere follow the mouse
-  let vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-  vector.unproject(camera);
-  let dir = vector.sub(camera.position).normalize();
-  let distance = -camera.position.z / dir.z;
-  let pos = camera.position.clone().add(dir.multiplyScalar(distance));
-  //mouseMesh.position.copy(pos);
+	// Make the sphere follow the mouse
+	let vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+	vector.unproject(camera);
+	let dir = vector.sub(camera.position).normalize();
+	let distance = -camera.position.z / dir.z;
+	let pos = camera.position.clone().add(dir.multiplyScalar(distance));
+	//mouseMesh.position.copy(pos);
 
-  light.position.copy(pos);
+	light.position.copy(pos);
 };
 
 let shiftPress = false;
 document.addEventListener('keydown', () => {
-  if (event.shiftKey) {
-    shiftPress = true;
-    document.addEventListener("mousemove", onMouseMove, false);
-  }
+	if (event.shiftKey) {
+		shiftPress = true;
+		document.addEventListener("mousemove", onMouseMove, false);
+	}
 })
 
 let centerX = window.innerWidth / 2;
@@ -49,19 +49,19 @@ let camera = new THREE.PerspectiveCamera(VIEW_ANGLE, SCREEN_WIDTH / SCREEN_HEIGH
 scene.add(camera);
 camera.position.z = 5;
 camera.position.set(0,150,1000);
-camera.lookAt(scene.position);	
+camera.lookAt(scene.position);
 
 window.addEventListener("resize", () => {
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
 });
 
 // RENDERER
 if ( Detector.webgl )
-  renderer = new THREE.WebGLRenderer( {antialias:true} );
+	renderer = new THREE.WebGLRenderer( {antialias:true} );
 else
-  renderer = new THREE.CanvasRenderer(); 
+	renderer = new THREE.CanvasRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
@@ -73,7 +73,7 @@ camera.add(light);
 
 // FLOOR
 let floorTexture = new THREE.TextureLoader().load( 'images/checkerboard.jpg' );
-floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
 floorTexture.repeat.set( 10, 10 );
 let floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
 let floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
@@ -85,18 +85,18 @@ floor.rotation.x = Math.PI / 2;
 let imagePrefix = "images/dawnmountain-";
 let directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
 let imageSuffix = ".png";
-let skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );	
+let skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
 
 let materialArray = [];
 for (let i = 0; i < 6; i++) {
-  materialArray.push( new THREE.MeshBasicMaterial({
-    map: new THREE.TextureLoader().load(imagePrefix + directions[i] + imageSuffix),
-    side: THREE.BackSide
-  }));
+	materialArray.push( new THREE.MeshBasicMaterial({
+		map: new THREE.TextureLoader().load(imagePrefix + directions[i] + imageSuffix),
+		side: THREE.BackSide
+	}));
 }
 let skyBox = new THREE.Mesh( skyGeometry, materialArray );
 // scene.add( skyBox );
-  
+
 
 let sphereRadius = 100;
 let sphereSegments = 32;
@@ -105,26 +105,26 @@ let sphereRings = 32;
 this.refractSphereCamera = new THREE.CubeCamera( 0.1, 5000, 512 );
 // scene.add( refractSphereCamera );
 let fShader = THREE.FresnelShader;
-let fresnelUniforms = 
+let fresnelUniforms =
 {
-  "mRefractionRatio": { type: "f", value: 1.02 },
-  "mFresnelBias": 	{ type: "f", value: 0.1 },
-  "mFresnelPower": 	{ type: "f", value: 2.0 },
-  "mFresnelScale": 	{ type: "f", value: 1.0 },
-  "tCube": 			{ type: "t", value: refractSphereCamera.renderTarget } //  textureCube }
+	"mRefractionRatio": { type: "f", value: 1.02 },
+	"mFresnelBias": 	{ type: "f", value: 0.1 },
+	"mFresnelPower": 	{ type: "f", value: 2.0 },
+	"mFresnelScale": 	{ type: "f", value: 1.0 },
+	"tCube": 			{ type: "t", value: refractSphereCamera.renderTarget } //  textureCube }
 };
-let customMaterial = new THREE.ShaderMaterial( 
+let customMaterial = new THREE.ShaderMaterial(
 {
-    uniforms: 		fresnelUniforms,
-  vertexShader:   fShader.vertexShader,
-  fragmentShader: fShader.fragmentShader
+		uniforms: 		fresnelUniforms,
+	vertexShader:   fShader.vertexShader,
+	fragmentShader: fShader.fragmentShader
 }   );
 
 
 let spheres = [];
 for (let i = 0; i < 0; i++) {
-  let sphere = new Sphere(sphereRadius, sphereSegments, sphereRings, [400*i, -200*i, 0], {text: 'Root Node ' + i, textColor: 0x00ffff});
-  spheres.push(sphere);
+	let sphere = new Sphere(sphereRadius, sphereSegments, sphereRings, [400*i, -200*i, 0], {text: 'Root Node ' + i, textColor: 0x00ffff});
+	spheres.push(sphere);
 }
 // refractSphereCamera.position = sphere.sphere.position;
 
@@ -147,22 +147,22 @@ let clock = new THREE.Clock();
 controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 let animate = function() {
-  requestAnimationFrame(animate);
+	requestAnimationFrame(animate);
 
-  // sphere.sphere.visible = false;
+	// sphere.sphere.visible = false;
 	// refractSphereCamera.update( renderer, scene );
-  // sphere.sphere.visible = true;
-  renderer.render(scene, camera);
-  
-  helix.animateHelix();
+	// sphere.sphere.visible = true;
+	renderer.render(scene, camera);
 
-  spheres.forEach( (sphere) => {
-    if(sphere.text_mesh) {
-    sphere.text_mesh.lookAt(camera.position);
-    }
-  })  
+	helix.animateHelix();
 
-  controls.update();
+	spheres.forEach( (sphere) => {
+		if(sphere.text_mesh) {
+		sphere.text_mesh.lookAt(camera.position);
+		}
+	})
+
+	controls.update();
 };
 
 animate();
