@@ -15,14 +15,14 @@ class DataColumns {
 	}
 }
 
-function readcsv(publicSpreadsheetUrl) {
-	Tabletop.init( { key: publicSpreadsheetUrl,
-											callback: showInfo,
-											simpleSheet: true } )
-}
+// function readcsv(publicSpreadsheetUrl) {
+// 	Tabletop.init( { key: publicSpreadsheetUrl,
+// 											callback: showInfo,
+// 											simpleSheet: true } )
+// }
 
-function showInfo(data, tabletop) {
-	console.log(data);
-}
+// function showInfo(data, tabletop) {
+// 	console.log(data);
+// }
 
-readcsv('https://docs.google.com/spreadsheets/d/1pct_LvoU40u6hu4GvuNXeMkJtCAWT-lgJNW_pgiOPg8');
+// readcsv('https://docs.google.com/spreadsheets/d/1pct_LvoU40u6hu4GvuNXeMkJtCAWT-lgJNW_pgiOPg8');
