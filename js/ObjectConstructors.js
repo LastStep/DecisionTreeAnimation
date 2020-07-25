@@ -30,23 +30,29 @@ class Sphere {
 
 class Helix {
 
-	constructor(helixRadius, helixWidth, numberOfParticles, {
+	constructor(helixRadius, helixWidth, numberOfParticles, startPos, endPos, {
 		color = 0xff0000,
 		size = 2,
 		particleMaterial = null,
 		frequency = 3,
-		spread = 6.282,
+		spread = 2 * Math.PI,
 		helixOffset = 0,
-		reverse = false
 	} = {}) {
 
+		this.startPos = new THREE.Vector3(...startPos);
+		this.endPos = new THREE.Vector3(...endPos);
+		this.axis = this.endPos.clone().sub(this.startPos);
+		this.axisUnit = this.axis.clone().normalize();
+		this.axisU = this.axisUnit.clone().cross(new THREE.Vector3(1, 0, 0));
+		this.axisV = this.axisU.clone().cross(this.axisUnit);
+		this.distance = this.startPos.distanceTo(this.endPos);
+	
 		this.helixRadius = helixRadius;
 		this.helixWidth = helixWidth;
 		this.helixOffset = helixOffset;
 		this.numberOfParticles = numberOfParticles;
 		this.clock = new THREE.Clock();
 		this.customCount = frequency * spread;
-		this.reverse = reverse ? -1 : 1;
 
 		this.particleGeometry = new THREE.Geometry();
 		for (var i = 0; i < numberOfParticles; i++) {
@@ -62,11 +68,10 @@ class Helix {
 			customColor: { type: 'c', value: [] },
 			customOffset: { type: 'f', value: [] },
 		};
-		this.particleCount = this.particleGeometry.vertices.length;
 
-		for (var v = 0; v < this.particleCount; v++) {
-			this.particleAttributes.customColor.value[v] = new THREE.Color().setHSL(1 - v / this.particleCount, 1.0, 0.5);
-			this.particleAttributes.customOffset.value[v] = this.customCount * (v / this.particleCount);
+		for (var v = 0; v < this.numberOfParticles; v++) {
+			this.particleAttributes.customColor.value[v] = new THREE.Color().setHSL(1 - v / this.numberOfParticles, 1.0, 0.5);
+			this.particleAttributes.customOffset.value[v] = this.customCount * (v / this.numberOfParticles);
 		}
 
 		if (!particleMaterial) {
@@ -77,28 +82,38 @@ class Helix {
 
 		this.particles = new THREE.Points(this.particleGeometry, this.particleMaterial);
 
-		scene.add(this.particles);
+		this.particles.position.set(...this.startPos.toArray());
+		this.particles.dynamic = true;
+		this.particles.sortParticles = true;
 
+		scene.add(this.particles);
 	}
 
-	helixPosition(helixRadius, t, helixWidth, helixOffset) {
+	helixPosition(t) {
+		let x0 = this.helixRadius * Math.cos(this.helixOffset + t);
+		let y0 = this.helixRadius * Math.sin(this.helixOffset + t);
+		let z0 = this.helixWidth  * t;
+
 		let position = new THREE.Vector3(
-			helixRadius * Math.cos(t+helixOffset),
-			helixRadius * Math.sin(t+helixOffset),
-			helixWidth * t * this.reverse);
-		return position;
+			x0 * this.axisU.x + y0 * this.axisV.x + z0 * this.axisUnit.x,
+			x0 * this.axisU.y + y0 * this.axisV.y + z0 * this.axisUnit.y,
+			x0 * this.axisU.z + y0 * this.axisV.z + z0 * this.axisUnit.z
+		)
+		
+		return position
 	}
 
 	animate() {
 		let t0 = this.clock.getElapsedTime();
 		this.particleUniforms.time.value = 0.125 * t0;
-		let v0 = this.customCount * ((this.particleCount - 1) / this.particleCount);
+		let v0 = this.customCount * ((this.numberOfParticles - 1) / this.numberOfParticles);
 		for (var v = 0; v < this.particleGeometry.vertices.length; v++) {
 			let timeOffset = this.particleUniforms.time.value + this.particleAttributes.customOffset.value[v];
 			if (timeOffset > v0) {
 				timeOffset = timeOffset - Math.floor(timeOffset / v0) * v0;
 			}
-      this.particleGeometry.vertices[v] = this.helixPosition(this.helixRadius, timeOffset, this.helixWidth, this.helixOffset)
+			this.particleGeometry.vertices[v] = this.helixPosition(timeOffset);
+
 		}
 		this.particles.geometry.verticesNeedUpdate = true;
 	}

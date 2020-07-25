@@ -122,9 +122,12 @@ let customMaterial = new THREE.ShaderMaterial(
 
 
 let spheres = [];
-let numOfSpheres = 3;
+let numOfSpheres = 4;
+
 for (let i = 0; i < numOfSpheres; i++) {
-	let sphere = new Sphere(sphereRadius, sphereSegments, sphereRings, [400*i, -200*i, 0], {text: 'Root Node ' + i, textColor: 0x00ffff});
+
+	let sphere = new Sphere(sphereRadius, sphereSegments, sphereRings, [400*i, -200*i, 300*i], 
+		{material: customMaterial, text: 'Root Node ' + i, textColor: 0x00ffff});
 	refractSphereCamera.position = sphere.sphere.position;
 	spheres.push(sphere);
 }
@@ -137,16 +140,19 @@ for (let i = 0; i < numOfSpheres; i++) {
 
 
 let helixes = [];
-let numOfHelixes = 2;
-let reverse = [false, true]
+let numOfHelixes = 3;
+let startPos = [[0, 0, 0], [100, 100, 0]]
+let endPos = [[300, 300, 300], [400, 500, 600]]
+
 for (let i = 0; i < numOfHelixes; i++) {
-	let helixOffset = [0, 3.141];
+
+	let helixOffset = [0, Math.PI];
 	let helixColor = [0x0000ff, 0x00ff00]
+
 	for(let j = 0; j < 2; j++) {
-		let helix = new Helix(30, 25, 100, {reverse: reverse[i], frequency: 3, helixOffset: helixOffset[j], color: helixColor[j]});
-		helix.particles.position.set(0, 0, 0);
-		helix.particles.dynamic = true;
-		helix.particles.sortParticles = true;
+
+		let helix = new Helix(40, 25, 100, [400*i, -200*i, 300*i], [400*(i+1), -200*(i+1), 300*(i+1)], 
+			{frequency: 3, helixOffset: helixOffset[j], color: helixColor[j]});
 		helixes.push(helix);
 	}
 }
