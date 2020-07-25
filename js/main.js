@@ -127,7 +127,7 @@ let numOfSpheres = 4;
 for (let i = 0; i < numOfSpheres; i++) {
 
 	let sphere = new Sphere(sphereRadius, sphereSegments, sphereRings, [400*i, -200*i, 300*i], 
-		{material: customMaterial, text: 'Root Node ' + i, textColor: 0x00ffff});
+		{material: null, text: 'Root Node ' + i, textColor: 0x00ffff});
 	refractSphereCamera.position = sphere.sphere.position;
 	spheres.push(sphere);
 }
@@ -140,7 +140,7 @@ for (let i = 0; i < numOfSpheres; i++) {
 
 
 let helixes = [];
-let numOfHelixes = 3;
+let numOfHelixes = 1;
 let startPos = [[0, 0, 0], [100, 100, 0]]
 let endPos = [[300, 300, 300], [400, 500, 600]]
 
@@ -151,8 +151,8 @@ for (let i = 0; i < numOfHelixes; i++) {
 
 	for(let j = 0; j < 2; j++) {
 
-		let helix = new Helix(40, 25, 100, [400*i, -200*i, 300*i], [400*(i+1), -200*(i+1), 300*(i+1)], 
-			{frequency: 3, helixOffset: helixOffset[j], color: helixColor[j]});
+		let helix = new Helix(40, 100, 100, [400*i, -200*i, 300*i], [400*(i+1), -200*(i+1), 300*(i+1)], 
+			{helixOffset: helixOffset[j], color: helixColor[j]});
 		helixes.push(helix);
 	}
 }

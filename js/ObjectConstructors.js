@@ -34,7 +34,6 @@ class Helix {
 		color = 0xff0000,
 		size = 2,
 		particleMaterial = null,
-		frequency = 3,
 		spread = 2 * Math.PI,
 		helixOffset = 0,
 	} = {}) {
@@ -45,14 +44,16 @@ class Helix {
 		this.axisUnit = this.axis.clone().normalize();
 		this.axisU = this.axisUnit.clone().cross(new THREE.Vector3(1, 0, 0));
 		this.axisV = this.axisU.clone().cross(this.axisUnit);
-		this.distance = this.startPos.distanceTo(this.endPos);
-	
+
 		this.helixRadius = helixRadius;
 		this.helixWidth = helixWidth;
+		this.distance = this.startPos.distanceTo(this.endPos);
+		this.frequency = this.distance / ( spread * this.helixWidth);
+	
 		this.helixOffset = helixOffset;
 		this.numberOfParticles = numberOfParticles;
 		this.clock = new THREE.Clock();
-		this.customCount = frequency * spread;
+		this.customCount = this.frequency * spread;
 
 		this.particleGeometry = new THREE.Geometry();
 		for (var i = 0; i < numberOfParticles; i++) {
