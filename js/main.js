@@ -126,7 +126,7 @@ let numOfSpheres = 4;
 
 for (let i = 0; i < numOfSpheres; i++) {
 
-	let sphere = new Sphere(sphereRadius, sphereSegments, sphereRings, [400*i, -200*i, 300*i], 
+	let sphere = new Sphere(sphereRadius, sphereSegments, sphereRings, [400*i, -200*i, 300*i],
 		{material: null, text: 'Root Node ' + i, textColor: 0x00ffff});
 	refractSphereCamera.position = sphere.sphere.position;
 	spheres.push(sphere);
@@ -151,7 +151,7 @@ for (let i = 0; i < numOfHelixes; i++) {
 
 	for(let j = 0; j < 2; j++) {
 
-		let helix = new Helix(40, 100, 100, [400*i, -200*i, 300*i], [400*(i+1), -200*(i+1), 300*(i+1)], 
+		let helix = new Helix(40, 100, 100, [400*i, -200*i, 300*i], [400*(i+1), -200*(i+1), 300*(i+1)],
 			{helixOffset: helixOffset[j], color: helixColor[j]});
 		helixes.push(helix);
 	}
@@ -184,3 +184,25 @@ let animate = function() {
 };
 
 animate();
+
+csvFile = 'data/iris.csv';
+
+function parse() {
+	const input = $('#csvOutput').val();
+	const data = $.csv.toArrays(input);
+	$('#result').html(JSON.stringify(data, null, 2));
+}
+
+readTextFile = async file => {
+	const response = await fetch(file)
+	const text = await response.text()
+	return text
+}
+
+(async () => {
+	data = await readTextFile(csvFile);
+	document.getElementById('csvOutput').textContent = data;
+	parse()
+})()
+
+
