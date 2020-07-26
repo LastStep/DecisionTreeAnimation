@@ -24,7 +24,7 @@ readTextFile = async (file, delimiter) => {
 }
 
 function parseData(data, delimiter) {
-	data = parse(data, delimiter);
-	console.log(data);
+	Data = parse(data, delimiter);
+	console.log(Data);
 }
 

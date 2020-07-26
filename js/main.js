@@ -186,7 +186,7 @@ animate();
 
 let csvFile = 'data/iris.csv';
 let delimiter = ",";
-let data;
+let Data;
 
 (async () => {
 	data = await readTextFile(csvFile, delimiter);
