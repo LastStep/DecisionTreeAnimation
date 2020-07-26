@@ -187,10 +187,10 @@ animate();
 
 csvFile = 'data/iris.csv';
 
-function parse() {
-	const input = $('#csvOutput').val();
-	const data = $.csv.toArrays(input);
-	$('#result').html(JSON.stringify(data, null, 2));
+function parse(text) {
+	let arr = text.split("\r\n")
+	let data = arr.filter(function(el) { return el != ""; });
+	document.getElementById('result').textContent = JSON.stringify(data, null, 2)
 }
 
 readTextFile = async file => {
@@ -201,8 +201,7 @@ readTextFile = async file => {
 
 (async () => {
 	data = await readTextFile(csvFile);
-	document.getElementById('csvOutput').textContent = data;
-	parse()
+	parse(data)
 })()
 
 
