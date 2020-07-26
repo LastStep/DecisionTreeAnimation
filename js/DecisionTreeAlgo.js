@@ -1,4 +1,4 @@
-let data = [];
+// let data = [];
 
 // Grab CSV Data
 // d3.csv("data/iris.csv").then(function(csvData){

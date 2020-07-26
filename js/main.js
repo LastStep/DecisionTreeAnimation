@@ -1,4 +1,3 @@
-
 let mouse = {
 	x: 0,
 	y: 0
@@ -185,12 +184,26 @@ let animate = function() {
 
 animate();
 
-csvFile = 'data/iris.csv';
+let csvFile = 'data/iris.csv';
+let delimiter = ",";
 
-function parse(text) {
-	let arr = text.split("\r\n")
-	let data = arr.filter(function(el) { return el != ""; });
-	document.getElementById('result').textContent = JSON.stringify(data, null, 2)
+function parse(text, delimiter) {
+	let columns = []
+	let arr = text.split("\n");
+	for (let i = 1; i < arr.length; i++) {
+		arr[i] = arr[i].split(delimiter);
+		for (let j = 0; j < arr[i].length; j++) {
+			try {
+				columns[j].push(arr[i][j]);
+			} catch (TypeError) {
+				columns[j] = [arr[i][j]];
+			}
+		}
+	}
+	let features = arr[0].split(",");
+	return [columns, features]
+	// let data = arr.filter(function(el) { return el != ""; });
+	// document.getElementById('result').textContent = JSON.stringify(data, null, 2);
 }
 
 readTextFile = async file => {
@@ -201,7 +214,7 @@ readTextFile = async file => {
 
 (async () => {
 	data = await readTextFile(csvFile);
-	parse(data)
+	data = parse(data, delimiter);
 })()
 
 
