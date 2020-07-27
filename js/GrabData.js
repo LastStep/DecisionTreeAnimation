@@ -1,5 +1,5 @@
 function parse(text, delimiter) {
-	let columns = []
+	let columns = [];
 	let arr = text.split("\n");
 	for (let i = 1; i < arr.length; i++) {
 		arr[i] = arr[i].split(delimiter);
@@ -12,9 +12,7 @@ function parse(text, delimiter) {
 		}
 	}
 	let features = arr[0].split(",");
-	return [columns, features]
-	// let data = arr.filter(function(el) { return el != ""; });
-	// document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+	return [features, columns]
 }
 
 readTextFile = async (file, delimiter) => {
@@ -24,7 +22,16 @@ readTextFile = async (file, delimiter) => {
 }
 
 function parseData(data, delimiter) {
-	result = parse(data, delimiter);
-	console.log(result);
+	[features, columns] = parse(data, delimiter);
 }
 
+/*
+Features :: Array of Column Names
+
+Columns  :: Array of Arrays,
+					  Each Array contains the whole Column
+
+					  Index is the Column Number
+
+Data     :: data parameter in any function is in similar form as columns
+*/
