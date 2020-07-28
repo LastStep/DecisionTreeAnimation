@@ -1,6 +1,9 @@
 function parse(text, delimiter) {
 	let columns = [];
-	let arr = text.split("\n");
+	let arr = text.split("\r\n");
+	arr = arr.filter(function (el) {
+		return el != "";
+	});
 	for (let i = 1; i < arr.length; i++) {
 		arr[i] = arr[i].split(delimiter);
 		for (let j = 0; j < arr[i].length; j++) {
@@ -12,14 +15,15 @@ function parse(text, delimiter) {
 		}
 	}
 	let features = arr[0].split(",");
-	return [features, columns]
+	// return [features, columns]
+	return [features, arr.slice(1)];
 }
 
 readTextFile = async (file, delimiter) => {
-	const response = await fetch(file)
-	const text = await response.text()
-	parseData(text, delimiter)
-}
+	const response = await fetch(file);
+	const text = await response.text();
+	parseData(text, delimiter);
+};
 
 function parseData(data, delimiter) {
 	[features, columns] = parse(data, delimiter);
