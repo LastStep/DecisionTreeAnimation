@@ -25,8 +25,8 @@ readTextFile = async (file, delimiter) => {
 	parseData(text, delimiter);
 };
 
-function parseData(data, delimiter) {
-	[features, columns] = parse(data, delimiter);
+function parseData(text, delimiter) {
+	[features, csvData] = parse(text, delimiter);
 }
 
 /*

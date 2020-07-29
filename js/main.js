@@ -71,7 +71,7 @@ for (let i = 0; i < numOfHelixes; i++) {
 
 let csvFile = 'data/iris.csv';
 let delimiter = ",";
-let features, columns;
+let features, csvData;
 
 (async () => {
 	await readTextFile(csvFile, delimiter);

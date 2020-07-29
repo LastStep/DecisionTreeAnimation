@@ -1,23 +1,10 @@
-//Data  :: Array of Arrays, Each Array contains the whole Column
-function getRow(data, index) {
-	let row = [];
-	data.forEach((element) => {
-		row.push(element[index]);
-	});
-	return row;
-}
-
-//Data  :: Array of Arrays, Each Array contains the whole Column
-function getRows(data, startIndex, endIndex) {
-	let rows = [];
-	for (let i = startIndex; i < endIndex; i++) {
-		rows.push(getRow(data, i));
-	}
-	return rows;
-}
-
-//Data  :: Array of Arrays, Each Array corresponds to single row
 function uniqueVals(data, col) {
+	/*
+	Find the unique values for a column in a dataset
+	input  :data in row format (array of arrays)
+					column index
+	output :array of unique values in a column
+	*/
 	let row = [];
 	data.forEach((element) => {
 		if (!row.includes(element[col])) {
@@ -27,8 +14,12 @@ function uniqueVals(data, col) {
 	return row;
 }
 
-//Data  :: Array of Arrays, Each Array corresponds to single row
 function classCounts(data) {
+	/* 
+	Counts the number of each type of example in a dataset
+	input  :data in row format (array of arrays)
+	output :dict for frequency of labels
+	*/
 	let counts = {};
 	data.forEach((row) => {
 		label = row.slice(-1)[0];
@@ -45,6 +36,12 @@ function isNumeric(num) {
 }
 
 class Question {
+	/* 
+	A Question is used to partition a dataset.
+	This class just records a 'column number' and a 'column value'. 
+	The 'match' method is used to compare 
+	the feature value in an example to the feature value stored in the question
+	*/
 	constructor(col, val) {
 		this.col = col;
 		this.val = val;
@@ -59,17 +56,25 @@ class Question {
 		}
 	}
 
-	repr() {
+	repr(features) {
 		let condition = "==";
 		if (isNumeric(this.val)) {
 			condition = ">=";
 		}
-		return `Is ${header[this.col]} ${condition} ${this.val}`;
+		return `Is ${features[this.col]} ${condition} ${this.val}?`;
 	}
 }
 
 //Data  :: Array of Arrays, Each Array corresponds to single row
 function partition(data, question) {
+	/* 
+	For each row in the dataset, check if it matches the question. If
+	so, add it to 'true rows', otherwise, add it to 'false rows'
+	input  :data in row format (array of arrays)
+					question as the object of Question
+	output :array[0] rows that satisfy the condition
+					array[1] rows that do not satisfy the condtion
+	*/
 	let [trueRows, falseRows] = [[], []];
 	for (let i = 0; i < data.length; i++) {
 		let row = data[i];
@@ -83,6 +88,11 @@ function partition(data, question) {
 }
 
 function gini(data) {
+	/* 
+	Calculate the Gini Impurity for a list of rows
+	input  :data in row format (array of arrays)
+	output :number
+	*/
 	let counts = classCounts(data);
 	let impurity = 1;
 	let numOfRows = data.length;
@@ -102,17 +112,19 @@ function findBestSplit(data) {
 	let bestQuestion = null;
 	let currentUncertainity = gini(data);
 	let numFeatures = data[0].length - 1; // Excluding the label column
-	for (let i = 0; i < numFeatures; i++) {
-		values = uniqueVals(data, i);
+
+	for (let col = 0; col < numFeatures; col++) {
+		values = uniqueVals(data, col);
+
 		for (let j = 0; j < values.length; j++) {
-			let question = new Question(i, values[j]);
+			let question = new Question(col, values[j]);
 			let [trueRows, falseRows] = [[], []];
 			[trueRows, falseRows] = partition(data, question);
 			if (trueRows.length === 0 || falseRows.length === 0) {
 				continue;
 			}
 			let gain = infoGain(trueRows, falseRows, currentUncertainity);
-			if (gain > bestGain) {
+			if (gain >= bestGain) {
 				[bestGain, bestQuestion] = [gain, question];
 			}
 		}
@@ -121,12 +133,14 @@ function findBestSplit(data) {
 }
 
 class Leaf {
+
 	constructor(data) {
 		this.predictions = classCounts(data);
 	}
 }
 
 class DecisionNode {
+
 	constructor(question, trueBranch, falseBranch) {
 		this.question = question;
 		this.trueBranch = trueBranch;
@@ -141,7 +155,7 @@ function buildTree(data) {
 
 	// Base case: no further info gain
 	// Since we can ask no further questions, we'll return a leaf.
-	if (gain == 0) {
+	if (!gain) {
 		return new Leaf(data);
 	}
 
@@ -156,25 +170,50 @@ function buildTree(data) {
 	return new DecisionNode(question, trueBranch, falseBranch);
 }
 
-function printTree(node, spacing = "") {
+function printTree(node, features, spacing = "") {
 	if (node instanceof Leaf) {
 		console.log(spacing + "Predict", node.predictions);
 		return;
 	}
 
-	console.log(spacing + node.question.repr());
+	console.log(spacing + node.question.repr(features));
 	console.log(spacing + "--> True:");
-	printTree(node.trueBranch, spacing + "  ");
+	printTree(node.trueBranch, features, spacing + "  ");
 
 	console.log(spacing + "--> False:");
-	printTree(node.falseBranch, spacing + "  ");
+	printTree(node.falseBranch, features, spacing + "  ");
 }
 
 function initiate(data, features) {
 	let myTree;
-	header = features;
 	myTree = buildTree(data);
-	printTree(myTree);
+	printTree(myTree, features);
+	return myTree;
+}
+
+function predictRow(testRow, tree) {
+	if (tree instanceof Leaf) {
+		let maxPred = 0;
+		let predictions = tree.predictions;
+		let prediction = [];
+		Object.keys(predictions).forEach((key) => {
+			if (predictions[key] >= maxPred) {
+				prediction.push(key);
+			}
+		});
+		return prediction;
+	}
+
+	return (testRow[tree.question.col] >= tree.question.val) ?
+		predictRow(testRow, tree.trueBranch) : predictRow(testRow, tree.falseBranch);
+}
+
+function predict(testData, tree) {
+	let predictions = [];
+	testData.forEach(testRow => {
+		predictions.push(predictRow(testRow, tree));
+	});
+	return predictions;
 }
 
 let trainingHeader = ["color", "diameter", "label"];
@@ -185,3 +224,12 @@ let trainingData = [
 	["Red", 1, "Grape"],
 	["Yellow", 3, "Lemon"],
 ];
+let testingData = [
+	['Green', 3, 'Apple'],
+	['Yellow', 4, 'Apple'],
+	['Red', 2, 'Grape'],
+	['Red', 1, 'Grape'],
+	['Yellow', 3, 'Lemon'],
+];
+
+
