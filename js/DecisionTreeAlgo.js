@@ -146,6 +146,7 @@ class DecisionNode {
 		this.trueBranch = trueBranch;
 		this.falseBranch = falseBranch;
 	}
+
 }
 
 function buildTree(data) {

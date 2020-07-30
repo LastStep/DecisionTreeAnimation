@@ -9,7 +9,7 @@ let VIEW_ANGLE = 90, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20
 let camera = new THREE.PerspectiveCamera(VIEW_ANGLE, SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR);
 scene.add(camera);
 camera.position.z = 5;
-camera.position.set(0,150,1000);
+camera.position.set(0,-500,1000);
 camera.lookAt(scene.position);
 
 window.addEventListener("resize", () => {
@@ -58,7 +58,7 @@ for (let i = 0; i < 6; i++) {
 	}));
 }
 let skyBox = new THREE.Mesh( skyGeometry, materialArray );
-scene.add( skyBox );
+// scene.add( skyBox );
 
 
 // Reflective Material

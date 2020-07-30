@@ -39,10 +39,8 @@ document.addEventListener('keydown', () => {
 
 
 let spheres = [];
-let numOfSpheres = 4;
-let sphereRadius = 100;
-let sphereSegments = 32;
-let sphereRings = 32;
+let numOfSpheres = 0;
+let [sphereRadius, sphereSegments, sphereRings] = [100, 32, 32];
 
 for (let i = 0; i < numOfSpheres; i++) {
 	let sphere = new Sphere(sphereRadius, sphereSegments, sphereRings, [400*i, -200*i, 300*i],
@@ -53,16 +51,15 @@ for (let i = 0; i < numOfSpheres; i++) {
 
 
 let helixes = [];
-let numOfHelixes = 1;
-let startPos = [[0, 0, 0], [100, 100, 0]]
-let endPos = [[300, 300, 300], [400, 500, 600]]
+let numOfHelixes = 0;
+let [helixRadius, helixWidth, numOfParticles] = [40, 100, 100];
+let helixOffset = [0, Math.PI];
+let helixColor = [0x0000ff, 0x00ff00]
 
 for (let i = 0; i < numOfHelixes; i++) {
-	let helixOffset = [0, Math.PI];
-	let helixColor = [0x0000ff, 0x00ff00]
 
 	for(let j = 0; j < 2; j++) {
-		let helix = new Helix(40, 100, 100, [400*i, -200*i, 300*i], [400*(i+1), -200*(i+1), 300*(i+1)],
+		let helix = new Helix(helixRadius, helixWidth, numOfParticles, [400*i, -200*i, 300*i], [400*(i+1), -200*(i+1), 300*(i+1)],
 			{helixOffset: helixOffset[j], color: helixColor[j]});
 		helixes.push(helix);
 	}
@@ -95,12 +92,19 @@ let animate = function() {
 	spheres.forEach( (sphere) => {
 		if(sphere.text_mesh) {
 		sphere.text_mesh.lookAt(camera.position);
+		// sphere.rotation.y -= 0.05;
 		}
 	})
 
 	controls.update();
 };
 
-// animate();
+animate();
+
+
+function start() {
+	let tree = initiate(csvData, features);
+	makeTree(tree, features);
+}
 
 
